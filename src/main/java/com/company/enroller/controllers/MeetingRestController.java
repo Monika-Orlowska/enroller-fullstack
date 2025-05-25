@@ -4,6 +4,7 @@ import com.company.enroller.model.Meeting;
 import com.company.enroller.model.Participant;
 import com.company.enroller.persistence.MeetingService;
 import com.company.enroller.persistence.ParticipantService;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,4 +77,43 @@ public class MeetingRestController {
         meetingService.update(meeting);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @RequestMapping(value ="/{id}/participants/{login}", method = RequestMethod.POST)
+    public ResponseEntity<?> addParticipantToMeeting(
+            @PathVariable("id") long meetingId,
+            @PathVariable("login") Participant participant) {
+        Meeting meeting = meetingService.findById(meetingId);
+        if (meeting == null) {
+            return new ResponseEntity<>("Meeting not found", HttpStatus.NOT_FOUND);
+        }
+        if (participant == null) {
+//            return new ResponseEntity<>("Participant not found", HttpStatus.NOT_FOUND);
+//        }
+//        if (meeting.getParticipants().contains(participant)) {
+//            return new ResponseEntity<>("Participant already added to meeting", HttpStatus.CONFLICT);
+      }
+        meeting.addParticipant(participant);
+        meetingService.update(meeting);
+        return new ResponseEntity<>(meeting, HttpStatus.OK);
+    }
+
+
+//    @RequestMapping (value ="/{id}/participants/{login}", method = RequestMethod.DELETE)
+//    public ResponseEntity<?>removeParticipant(Participant participant) {
+//        (@PathVariable("id") long meetingId, @PathVariable("login") String login) {
+//        Meeting meeting = meetingService.findById(meetingId);
+//        if (meeting == null) {
+//            return new ResponseEntity<>("Meeting not found", HttpStatus.NOT_FOUND);
+//        }
+//        Participant participant = participantService.findByLogin(login);
+//        if (participant == null) {
+//            return new ResponseEntity<>("Participant not found", HttpStatus.NOT_FOUND);
+//        }
+//        if (!meeting.getParticipants().contains(participant)) {
+//            return new ResponseEntity<>("Participant not in meeting", HttpStatus.NOT_FOUND);
+//        }
+//        meeting.getParticipants().remove(participant);
+//        meetingService.update(meeting);
+//        return new ResponseEntity<>(meeting, HttpStatus.OK);
+//    }
+
 }

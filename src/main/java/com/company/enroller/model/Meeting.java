@@ -1,6 +1,7 @@
 package com.company.enroller.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "meeting")
@@ -70,15 +72,22 @@ public class Meeting {
         this.date = date;
     }
 
+    public Collection<Participant> getParticipants() {
+        return participants;
+    }
+
+    @JsonProperty("participants") // Serializes as participant logins
+    public Set<String> getParticipantLogins() {
+        return participants.stream()
+                .map(Participant::getLogin)
+                .collect(Collectors.toSet());
+    }
+
     public void addParticipant(Participant participant) {
         this.participants.add(participant);
     }
 
     public void removeParticipant(Participant participant) {
         this.participants.remove(participant);
-    }
-
-    public Collection<Participant> getParticipants() {
-        return participants;
     }
 }

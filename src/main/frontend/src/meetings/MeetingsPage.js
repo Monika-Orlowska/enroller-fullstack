@@ -18,7 +18,6 @@ export default function MeetingsPage({username}) {
     }, []);
 
 
-
     async function handleNewMeeting(meeting) {
         const response = await fetch('/api/meetings', {
             method: 'POST',
@@ -32,6 +31,38 @@ export default function MeetingsPage({username}) {
             setAddingNewMeeting(false);
         }
     }
+
+    async function handleSignUp(meetingId, meeting) {
+        const response = await fetch(`/api/meetings/${meetingId}/participants`, { // ✅ Login w URL
+            method: 'POST',
+            body: JSON.stringify({login:username}, meeting),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            const updatedMeeting = await response.json();
+            setMeetings(meetings.map(m =>
+                m.id === updatedMeeting.id ? updatedMeeting : m
+            ));
+        }
+    }
+
+
+    async function handleUnsubscribe(meetingId) {
+        const response = await fetch(`/api/meetings/${meetingId}/participants`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok) {
+            const updatedMeeting = await response.json();
+            setMeetings(meetings.map(m =>
+                m.id === updatedMeeting.id ? updatedMeeting : m
+            ));
+        }
+    }
+
+
+
 
     async function handleDeleteMeeting(meeting) {
         const response = await fetch(`/api/meetings/${meeting.id}`, {
@@ -48,12 +79,17 @@ export default function MeetingsPage({username}) {
             <h2>Zajęcia ({meetings.length})</h2>
             {
                 addingNewMeeting
-                    ? <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)}/>
+                    ? <NewMeetingForm onSubmit={handleNewMeeting}/>
                     : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
             }
             {meetings.length > 0 &&
-                <MeetingsList meetings={meetings} username={username}
-                              onDelete={handleDeleteMeeting}/>}
+                <MeetingsList
+                    meetings={meetings}
+                    username={username}
+                    onSignUp={handleSignUp}
+                    onUnsubscribe={handleUnsubscribe}
+                    onDelete={handleDeleteMeeting}
+                />}
         </div>
     )
 }
